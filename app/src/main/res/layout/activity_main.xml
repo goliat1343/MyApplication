@@ -16,21 +16,20 @@
         android:editable="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/btnShowSms" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnShowSms"
         android:layout_width="145dp"
         android:layout_height="39dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:elevation="0dp"
         android:onClick="wyswietlText"
         android:text="No sprobuj.."
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnSetPermissions"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
@@ -50,5 +49,18 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textSmsCount"
         app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/btnSetPermissions"
+        android:layout_width="145dp"
+        android:layout_height="39dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="8dp"
+        android:onClick="setPermissions"
+        android:text="Pozwolenia"
+        app:layout_constraintBottom_toTopOf="@+id/textSmsCount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
