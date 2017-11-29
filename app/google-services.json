@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "714916546242",
+    "firebase_url": "https://top-caldron-144305.firebaseio.com",
+    "project_id": "top-caldron-144305",
+    "storage_bucket": "top-caldron-144305.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714916546242:android:f6b1227f4d2cb332",
+        "android_client_info": {
+          "package_name": "com.example.marekwieciech.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714916546242-mcq07c8gtdpogcjb81l03m0k645hfj7q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5AioI4yBJ3Hol9MOxl3bnz7Qt6sdoR-c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

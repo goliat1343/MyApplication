@@ -1,17 +1,23 @@
 package com.example.marekwieciech.myapplication;
 
 import android.Manifest;
-import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Location;
 import android.os.Build;
 import android.provider.Telephony;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,16 +27,50 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private FusedLocationProviderClient mFusedLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((TextView) findViewById(R.id.textSms)).setKeyListener(null);           //make TextView readonly
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
-    public void setPermissions(View view){
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
+    public void setPermissions(View view) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             this.requestPermissions(new String[]{Manifest.permission.READ_SMS}, 1);
         }
+    }
+
+    public void getLocation(View view) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            TextView textViewsSms = (TextView) findViewById(R.id.textSms);
+                            textViewsSms.setText(location.toString());
+                        }
+                    }
+                });
+    }
+
+    public void showMap(View view){
+        Intent intent = new Intent(this, MWMapsActivity.class);
+        startActivity(intent);
+        Toast.makeText(this, "....ma.....pa.....Cie.....pcha....", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -46,35 +86,10 @@ public class MainActivity extends AppCompatActivity {
     public void wyswietlText(View view) {
         List<String> lstSms = new ArrayList<String>();
         ContentResolver cr = this.getContentResolver();
-        TextView textView = (TextView) findViewById(R.id.textSmsCount);
-        TextView textViewsSms = (TextView) findViewById(R.id.textSMS);
+        TextView textViewSmsCount = (TextView) findViewById(R.id.textSmsCount);
+        TextView textViewsSms = (TextView) findViewById(R.id.textSms);
 
         try {
-
-            /*
-            Cursor c = cr.query(Telephony.Sms.Inbox.CONTENT_URI, // Official CONTENT_URI from docs
-                    new String[] { Telephony.Sms.Inbox.BODY }, // Select body text
-                    null,
-                    null,
-                    Telephony.Sms.Inbox.DEFAULT_SORT_ORDER); // Default sort order
-
-            int totalSMS = c.getCount();
-
-            textView.setText(Integer.toString(totalSMS));
-
-            if (c.moveToFirst()) {
-                for (int i = 0; i < 20; i++) {
-                    lstSms.add(c.getString(0));
-                    lstSms.add("\n----------\n");
-                    c.moveToNext();
-                }
-            } else {
-                //throw new RuntimeException("You have no SMS in Inbox");
-            }
-            c.close();
-
-            textViewsSms.setText(lstSms.size() + "\n\n||||||||||||||||||\n\n" + lstSms.toString());
-            */
 
             Cursor conversations = cr.query(Telephony.MmsSms.CONTENT_CONVERSATIONS_URI,
                     new String[]{ Telephony.Sms.BODY,
@@ -114,9 +129,12 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 throw new RuntimeException("You have no SMS in Inbox");
             }
-            conversations.close();
 
             textViewsSms.setText(lstSms.size() + "\n\n" + lstSms.toString());
+            //textViewSmsCount.setText(conversations.getCount());
+
+            Toast.makeText(this, "Jadziem panie na baranie......by Goliat....really by Goliat.....wtf?? :D", Toast.LENGTH_SHORT).show();
+            conversations.close();
 
         } catch (Exception e){
             Writer w = new StringWriter();
