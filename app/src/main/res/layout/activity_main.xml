@@ -75,4 +75,30 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSetPermissions" />
 
+    <Button
+        android:id="@+id/btnWriteFile"
+        android:layout_width="0dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="writeFile"
+        android:text="Zapisz plik"
+        app:layout_constraintEnd_toStartOf="@+id/btnSetPermissions"
+        app:layout_constraintStart_toEndOf="@+id/btnShowSms"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnReadFile"
+        android:layout_width="0dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:onClick="readFile"
+        android:text="Wczytaj plik"
+        app:layout_constraintEnd_toStartOf="@+id/btnShowMap"
+        app:layout_constraintStart_toEndOf="@+id/btnShowLocation"
+        app:layout_constraintTop_toBottomOf="@+id/btnWriteFile" />
+
 </android.support.constraint.ConstraintLayout>

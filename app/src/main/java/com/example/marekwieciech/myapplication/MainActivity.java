@@ -2,15 +2,18 @@ package com.example.marekwieciech.myapplication;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +22,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -33,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((TextView) findViewById(R.id.textSms)).setKeyListener(null);           //make TextView readonly
+        //((TextView) findViewById(R.id.textSms)).setKeyListener(null);           //make TextView readonly
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
@@ -61,28 +69,52 @@ public class MainActivity extends AppCompatActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             TextView textViewsSms = (TextView) findViewById(R.id.textSms);
-                            textViewsSms.setText(location.toString());
+                            textViewsSms.setText(location.toString() + "\n\n Mock? : " + location.isFromMockProvider());
                         }
                     }
                 });
+
+
+        //DELETE  this is for removing mock localization provider apps
+        /*LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        TextView textViewsSms = (TextView) findViewById(R.id.textSms);
+        try {
+            Log.d("by Goliat", "Removing Test providers");
+            textViewsSms.setText("Removing Test providers");
+            Toast.makeText(this, "Removing Test providers", Toast.LENGTH_LONG).show();
+            lm.clearTestProviderEnabled(LocationManager.GPS_PROVIDER);
+            lm.clearTestProviderLocation(LocationManager.GPS_PROVIDER);
+            lm.clearTestProviderStatus(LocationManager.GPS_PROVIDER);
+            lm.removeTestProvider(LocationManager.GPS_PROVIDER);
+        } catch (IllegalArgumentException error) {
+            textViewsSms.setText(error.toString());
+            Toast.makeText(this, "Got exception in removing test  provider", Toast.LENGTH_LONG).show();
+            Log.d("by Goliat", "Got exception in removing test  provider");
+        } catch (Exception error) {
+            textViewsSms.setText(error.toString());
+        }*/
+
+
     }
 
-    public void showMap(View view){
+    public void showMap(View view) {
         Intent intent = new Intent(this, MWMapsActivity.class);
         startActivity(intent);
         Toast.makeText(this, "....ma.....pa.....Cie.....pcha....", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-        if(requestCode == 1 && permissions.length > 0 && permissions[0] == Manifest.permission.READ_SMS){
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == 1 && permissions.length > 0 && permissions[0] == Manifest.permission.READ_SMS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 (findViewById(R.id.btnSetPermissions)).setEnabled(false);
             }
         }
     }
 
-    /** Called when the user taps the Send button */
+    /**
+     * Called when the user taps the Send button
+     */
     public void wyswietlText(View view) {
         List<String> lstSms = new ArrayList<String>();
         ContentResolver cr = this.getContentResolver();
@@ -92,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             Cursor conversations = cr.query(Telephony.MmsSms.CONTENT_CONVERSATIONS_URI,
-                    new String[]{ Telephony.Sms.BODY,
+                    new String[]{Telephony.Sms.BODY,
                             Telephony.Sms.THREAD_ID,
                             Telephony.Sms.PERSON,
                             Telephony.Sms.ADDRESS,
@@ -107,10 +139,10 @@ public class MainActivity extends AppCompatActivity {
             lstSms.clear();
 
             int columnBody = conversations.getColumnIndexOrThrow(Telephony.Sms.BODY);
-            int columnThreadId =  conversations.getColumnIndexOrThrow(Telephony.Sms.THREAD_ID);
+            int columnThreadId = conversations.getColumnIndexOrThrow(Telephony.Sms.THREAD_ID);
             int columnPerson = conversations.getColumnIndexOrThrow(Telephony.Sms.PERSON);
             int columnAddres = conversations.getColumnIndexOrThrow(Telephony.Sms.ADDRESS);
-            int columnDate =  conversations.getColumnIndexOrThrow(Telephony.Sms.DATE);
+            int columnDate = conversations.getColumnIndexOrThrow(Telephony.Sms.DATE);
             int columnType = conversations.getColumnIndexOrThrow(Telephony.Sms.TYPE);
 
 
@@ -136,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Jadziem panie na baranie......by Goliat....really by Goliat.....wtf?? :D", Toast.LENGTH_SHORT).show();
             conversations.close();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Writer w = new StringWriter();
             e.printStackTrace(new PrintWriter(w));
             textViewsSms.setText(w.toString());
@@ -145,5 +177,43 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void writeFile(View view){
+        String fileName = "test_file_MW";
+        TextView textViewSms = findViewById(R.id.textSms);
+
+        try {
+            FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+            fos.write(textViewSms.getText().toString().getBytes());
+            fos.close();
+        } catch (Exception e) {
+            textViewSms.setText(e.toString());
+        }
+    }
+
+    public void readFile(View view){
+        String fileName = "test_file_MW";
+        TextView textViewSms = findViewById(R.id.textSms);
+
+        try {
+            FileInputStream fis = openFileInput(fileName);
+
+            if (fis != null) {
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null){
+                sb.append(line).append("\n");
+            }
+
+            fis.close();
+            textViewSms.setText(sb.toString());
+
+            }
+        } catch (Exception e) {
+            textViewSms.setText(e.toString());
+        }
+    }
 
 }
