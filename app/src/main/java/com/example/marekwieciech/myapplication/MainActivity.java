@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Telephony;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,7 +21,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -37,12 +42,25 @@ public class MainActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient mFusedLocationClient;
 
+    // Remote Config keys
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private static final long cacheExpiration = 0;      //indicating the next fetch request
+                                                        // will use fetch data from the Remote Config service, rather than cached parameter values,
+                                                        // if cached parameter values are more than cacheExpiration seconds old.
+    private static final String PARAM_STRING_1 = "param_string_1";
+    private static final String PARAM_STRING_2 = "param_string_2";
+    private static final String PARAM_STRING_1_CAPS = "param_string_1_caps";
+    private static final String PARAM_STRING_2_CAPS = "param_string_2_caps";
+    private static final String PARAM_BOOLEAN = "param_boolean";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //((TextView) findViewById(R.id.textSms)).setKeyListener(null);           //make TextView readonly
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        showRemoteCofingParameters();
     }
 
     public void setPermissions(View view) {
@@ -118,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
     public void wyswietlText(View view) {
         List<String> lstSms = new ArrayList<String>();
         ContentResolver cr = this.getContentResolver();
-        TextView textViewSmsCount = (TextView) findViewById(R.id.textSmsCount);
         TextView textViewsSms = (TextView) findViewById(R.id.textSms);
 
         try {
@@ -174,7 +191,8 @@ public class MainActivity extends AppCompatActivity {
             textViewsSms.setText(w.toString());
         }
 
-
+        //For testing only
+        showRemoteCofingParameters();
     }
 
     public void writeFile(View view){
@@ -214,6 +232,49 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             textViewSms.setText(e.toString());
         }
+    }
+
+    private void showRemoteCofingParameters(){
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        // Create a Remote Config Setting to enable developer mode, which you can use to increase
+        // the number of fetches available per hour during development. See Best Practices in the
+        // README for more information.
+        // [START enable_dev_mode]
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        // [END enable_dev_mode]
+
+        // Set default Remote Config parameter values. An app uses the in-app default values, and
+        // when you need to adjust those defaults, you set an updated value for only the values you
+        // want to change in the Firebase console. See Best Practices in the README for more
+        // information.
+        // [START set_default_values]
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+        // [END set_default_values]
+
+        mFirebaseRemoteConfig.fetch(cacheExpiration).addOnCompleteListener(this, new OnCompleteListener<Void>(){
+            @Override
+            public void onComplete(@NonNull Task<Void> task){
+                if (task.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "Fetch Succeeded",
+                            Toast.LENGTH_SHORT).show();
+
+                    // After config data is successfully fetched, it must be activated before newly fetched
+                    // values are returned.
+                    mFirebaseRemoteConfig.activateFetched();
+                } else {
+                    Toast.makeText(MainActivity.this, "Fetch Failed",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                TextView textSmsCount = findViewById(R.id.textSmsCount);
+                textSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
+                textSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
+            }
+        });
     }
 
 }

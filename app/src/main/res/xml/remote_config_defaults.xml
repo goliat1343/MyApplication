@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>param_string_1</key>
+        <value>eee....</value>
+    </entry>
+    <entry>
+        <key>param_string_2</key>
+        <value>drugie eeee....</value>
+    </entry>
+    <entry>
+        <key>param_string_1_caps</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>param_string_2_caps</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>param_boolean</key>
+        <value>false</value>
+    </entry>
+</defaultsMap>
+    <!-- END xml_defaults -->

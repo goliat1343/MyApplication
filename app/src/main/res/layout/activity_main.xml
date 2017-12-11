@@ -96,7 +96,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:onClick="readFile"
-        android:text="Wczytaj plik"
+        android:text="Wczytaj"
         app:layout_constraintEnd_toStartOf="@+id/btnShowMap"
         app:layout_constraintStart_toEndOf="@+id/btnShowLocation"
         app:layout_constraintTop_toBottomOf="@+id/btnWriteFile" />

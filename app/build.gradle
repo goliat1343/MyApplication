@@ -33,6 +33,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:11.6.2'
     compile 'com.google.firebase:firebase-core:11.6.2'                        // this line must be included to integrate with Firebase
     compile 'com.google.firebase:firebase-messaging:11.6.2'                   // this line must be included to use FCM
+    compile 'com.google.firebase:firebase-config:11.6.2'                        //for firebase remoteConfig
     testCompile 'junit:junit:4.12'
 }
 
