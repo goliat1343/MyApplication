@@ -18,8 +18,53 @@
         <value>false</value>
     </entry>
     <entry>
-        <key>param_boolean</key>
-        <value>false</value>
+        <key>btnShowSms_isVisible</key>
+        <value>true</value>
     </entry>
+    <entry>
+        <key>btnShowSms_isEnabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnSetPermissions_isVisible</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnSetPermissions_isEnabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnShowLocation_isVisible</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnShowLocation_isEnabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnShowMap_isVisible</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnShowMap_isEnabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnWriteFile_isVisible</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnWriteFile_isEnabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnReadFile_isVisible</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>btnReadFile_isEnabled</key>
+        <value>true</value>
+    </entry>
+    
 </defaultsMap>
     <!-- END xml_defaults -->

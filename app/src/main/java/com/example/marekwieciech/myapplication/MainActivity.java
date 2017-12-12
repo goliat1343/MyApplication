@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -42,16 +44,39 @@ public class MainActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient mFusedLocationClient;
 
-    // Remote Config keys
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    //Remote Config keys
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private static final long cacheExpiration = 0;      //indicating the next fetch request
                                                         // will use fetch data from the Remote Config service, rather than cached parameter values,
                                                         // if cached parameter values are more than cacheExpiration seconds old.
+    
     private static final String PARAM_STRING_1 = "param_string_1";
     private static final String PARAM_STRING_2 = "param_string_2";
     private static final String PARAM_STRING_1_CAPS = "param_string_1_caps";
     private static final String PARAM_STRING_2_CAPS = "param_string_2_caps";
     private static final String PARAM_BOOLEAN = "param_boolean";
+    private static final String PARAM_BTNSHOWSMS_ISVISIBLE = "btnShowSms_isVisible";
+    private static final String PARAM_BTNSHOWSMS_ISENABLED = "btnShowSms_isEnabled";
+    private static final String PARAM_BTNSETPERMISSIONS_ISVISIBLE = "btnSetPermissions_isVisible";
+    private static final String PARAM_BTNSETPERMISSIONS_ISENABLED = "btnSetPermissions_isEnabled";
+    private static final String PARAM_BTNSHOWLOCATION_ISVISIBLE = "btnShowLocation_isVisible";
+    private static final String PARAM_BTNSHOWLOCATION_ISENABLED = "btnShowLocation_isEnabled";
+    private static final String PARAM_BTNSHOWMAP_ISVISIBLE = "btnShowMap_isVisible";
+    private static final String PARAM_BTNSHOWMAP_ISENABLED = "btnShowMap_isEnabled";
+    private static final String PARAM_BTNWRITEFILE_ISVISIBLE = "btnWriteFile_isVisible";
+    private static final String PARAM_BTNWRITEFILE_ISENABLED = "btnWriteFile_isEnabled";
+    private static final String PARAM_BTNREADFIlE_ISVISIBLE = "btnReadFile_isVisible";
+    private static final String PARAM_BTNREADFIlE_ISENABLED = "btnReadFile_isEnabled";
+
+    //Buttons
+    Button btnShowSms;
+    Button btnSetPermissions;
+    Button btnShowLocation;
+    Button btnShowMap;
+    Button btnWriteFile;
+    Button btnReadFile;
 
 
     @Override
@@ -60,12 +85,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //((TextView) findViewById(R.id.textSms)).setKeyListener(null);           //make TextView readonly
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        btnShowSms = findViewById(R.id.btnShowSms);
+        btnSetPermissions = findViewById(R.id.btnSetPermissions);
+        btnShowLocation = findViewById(R.id.btnShowLocation);
+        btnShowMap = findViewById(R.id.btnShowMap);
+        btnWriteFile = findViewById(R.id.btnWriteFile);
+        btnReadFile = findViewById(R.id.btnReadFile);
+
         showRemoteCofingParameters();
     }
 
     public void setPermissions(View view) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            this.requestPermissions(new String[]{Manifest.permission.READ_SMS}, 1);
+            this.requestPermissions(new String[]{Manifest.permission.READ_SMS, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
@@ -191,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
             textViewsSms.setText(w.toString());
         }
 
+        logBtnClicked(btnShowSms);
+
         //For testing only
         showRemoteCofingParameters();
     }
@@ -259,22 +297,43 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task){
                 if (task.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, "Fetch Succeeded",
-                            Toast.LENGTH_SHORT).show();
-
-                    // After config data is successfully fetched, it must be activated before newly fetched
-                    // values are returned.
                     mFirebaseRemoteConfig.activateFetched();
                 } else {
-                    Toast.makeText(MainActivity.this, "Fetch Failed",
+                    Toast.makeText(MainActivity.this, "Parameters fetch Failed",
                             Toast.LENGTH_SHORT).show();
                 }
 
                 TextView textSmsCount = findViewById(R.id.textSmsCount);
                 textSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
                 textSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
+
+                btnShowSms.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWSMS_ISVISIBLE) ? View.VISIBLE : View.GONE);
+                btnSetPermissions.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSETPERMISSIONS_ISVISIBLE) ? View.VISIBLE : View.GONE);
+                btnShowLocation.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWLOCATION_ISVISIBLE) ? View.VISIBLE : View.GONE);
+                btnShowMap.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWMAP_ISVISIBLE) ? View.VISIBLE : View.GONE);
+                btnWriteFile.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNWRITEFILE_ISVISIBLE) ? View.VISIBLE : View.GONE);
+                btnReadFile.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNREADFIlE_ISVISIBLE) ? View.VISIBLE : View.GONE);
+
+                btnShowSms.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWSMS_ISENABLED));
+                btnSetPermissions.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSETPERMISSIONS_ISENABLED));
+                btnShowLocation.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWLOCATION_ISENABLED));
+                btnShowMap.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWMAP_ISENABLED));
+                btnWriteFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNWRITEFILE_ISENABLED));
+                btnReadFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNREADFIlE_ISENABLED));
             }
         });
+    }
+
+    private void logBtnClicked(Button btn){
+        Bundle bundle = new Bundle();
+        bundle.putString("button_id", getResources().getResourceEntryName(btn.getId()));
+        mFirebaseAnalytics.logEvent("BUTTON_CLCICKED_MW", bundle);
+
+        Bundle bundle1 = new Bundle();
+        bundle1.putString(FirebaseAnalytics.Param.ITEM_NAME, getResources().getResourceEntryName(btn.getId()));
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle1);
+
+        Toast.makeText(this, "Zalogowano eventa", Toast.LENGTH_LONG).show();
     }
 
 }
