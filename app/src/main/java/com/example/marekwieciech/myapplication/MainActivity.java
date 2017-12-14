@@ -2,19 +2,17 @@ package com.example.marekwieciech.myapplication;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,7 +29,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -56,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String PARAM_STRING_2 = "param_string_2";
     private static final String PARAM_STRING_1_CAPS = "param_string_1_caps";
     private static final String PARAM_STRING_2_CAPS = "param_string_2_caps";
-    private static final String PARAM_BOOLEAN = "param_boolean";
     private static final String PARAM_BTNSHOWSMS_ISVISIBLE = "btnShowSms_isVisible";
     private static final String PARAM_BTNSHOWSMS_ISENABLED = "btnShowSms_isEnabled";
     private static final String PARAM_BTNSETPERMISSIONS_ISVISIBLE = "btnSetPermissions_isVisible";
@@ -78,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
     Button btnWriteFile;
     Button btnReadFile;
 
+    //TextViewz
+    TextView textViewSmsCount;
+    TextView textViewSms;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
         btnShowMap = findViewById(R.id.btnShowMap);
         btnWriteFile = findViewById(R.id.btnWriteFile);
         btnReadFile = findViewById(R.id.btnReadFile);
+
+        textViewSmsCount = findViewById(R.id.textSmsCount);
+        textViewSms = findViewById(R.id.textSms);
+
+        textViewSms.setMovementMethod(new ScrollingMovementMethod());
 
         showRemoteCofingParameters();
     }
@@ -172,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
     public void wyswietlText(View view) {
         List<String> lstSms = new ArrayList<String>();
         ContentResolver cr = this.getContentResolver();
-        TextView textViewsSms = (TextView) findViewById(R.id.textSms);
 
         try {
 
@@ -215,8 +219,8 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException("You have no SMS in Inbox");
             }
 
-            textViewsSms.setText(lstSms.size() + "\n\n" + lstSms.toString());
-            //textViewSmsCount.setText(conversations.getCount());
+            textViewSms.setText(lstSms.size() + "\n\n" + lstSms.toString());
+
 
             Toast.makeText(this, "Jadziem panie na baranie......by Goliat....really by Goliat.....wtf?? :D", Toast.LENGTH_SHORT).show();
             conversations.close();
@@ -224,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Writer w = new StringWriter();
             e.printStackTrace(new PrintWriter(w));
-            textViewsSms.setText(w.toString());
+            textViewSms.setText(w.toString());
         }
 
         logBtnClicked(btnShowSms);
@@ -235,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void writeFile(View view){
         String fileName = "test_file_MW";
-        TextView textViewSms = findViewById(R.id.textSms);
 
         try {
             FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
@@ -248,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void readFile(View view){
         String fileName = "test_file_MW";
-        TextView textViewSms = findViewById(R.id.textSms);
 
         try {
             FileInputStream fis = openFileInput(fileName);
@@ -303,10 +305,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
 
-                TextView textSmsCount = findViewById(R.id.textSmsCount);
-                textSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
-                textSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
-
                 btnShowSms.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWSMS_ISVISIBLE) ? View.VISIBLE : View.GONE);
                 btnSetPermissions.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSETPERMISSIONS_ISVISIBLE) ? View.VISIBLE : View.GONE);
                 btnShowLocation.setVisibility(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWLOCATION_ISVISIBLE) ? View.VISIBLE : View.GONE);
@@ -320,6 +318,15 @@ public class MainActivity extends AppCompatActivity {
                 btnShowMap.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNSHOWMAP_ISENABLED));
                 btnWriteFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNWRITEFILE_ISENABLED));
                 btnReadFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNREADFIlE_ISENABLED));
+
+                textViewSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
+                textViewSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
+
+                String paramString2 = mFirebaseRemoteConfig.getString(PARAM_STRING_2);
+                if (!paramString2.isEmpty() && paramString2.length() > 0){
+                    textViewSms.setText(paramString2.replaceAll("<n_l>", "\n"));
+                    textViewSms.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_2_CAPS ));
+                }
             }
         });
     }
@@ -329,11 +336,10 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString("button_id", getResources().getResourceEntryName(btn.getId()));
         mFirebaseAnalytics.logEvent("BUTTON_CLCICKED_MW", bundle);
 
-        Bundle bundle1 = new Bundle();
-        bundle1.putString(FirebaseAnalytics.Param.ITEM_NAME, getResources().getResourceEntryName(btn.getId()));
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle1);
-
-        Toast.makeText(this, "Zalogowano eventa", Toast.LENGTH_LONG).show();
+        //DELETE firebase defined events logging
+//        Bundle bundle1 = new Bundle();
+//        bundle1.putString(FirebaseAnalytics.Param.ITEM_NAME, getResources().getResourceEntryName(btn.getId()));
+//        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle1);
     }
 
 }
