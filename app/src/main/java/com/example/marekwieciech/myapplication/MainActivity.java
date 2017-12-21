@@ -101,7 +101,40 @@ public class MainActivity extends AppCompatActivity {
 
         textViewSms.setMovementMethod(new ScrollingMovementMethod());
 
-        showRemoteCofingParameters();
+
+        //Firebase
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        // Create a Remote Config Setting to enable developer mode, which you can use to increase
+        // the number of fetches available per hour during development. See Best Practices in the
+        // README for more information.
+        // [START enable_dev_mode]
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        // [END enable_dev_mode]
+
+        // Set default Remote Config parameter values. An app uses the in-app default values, and
+        // when you need to adjust those defaults, you set an updated value for only the values you
+        // want to change in the Firebase console. See Best Practices in the README for more
+        // information.
+        // [START set_default_values]
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+        // [END set_default_values]
+
+
+
+
+        //Data from notifcation
+        boolean dontChangeTextViewSmsCount = false;
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null){
+            textViewSmsCount.setText(bundle.getString("text", ""));
+            dontChangeTextViewSmsCount = true;
+        }
+
+        showRemoteCofingParameters(dontChangeTextViewSmsCount);
     }
 
     public void setPermissions(View view) {
@@ -234,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         logBtnClicked(btnShowSms);
 
         //For testing only
-        showRemoteCofingParameters();
+        showRemoteCofingParameters(false);
     }
 
     public void writeFile(View view){
@@ -274,26 +307,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showRemoteCofingParameters(){
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-        // Create a Remote Config Setting to enable developer mode, which you can use to increase
-        // the number of fetches available per hour during development. See Best Practices in the
-        // README for more information.
-        // [START enable_dev_mode]
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-        // [END enable_dev_mode]
-
-        // Set default Remote Config parameter values. An app uses the in-app default values, and
-        // when you need to adjust those defaults, you set an updated value for only the values you
-        // want to change in the Firebase console. See Best Practices in the README for more
-        // information.
-        // [START set_default_values]
-        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
-        // [END set_default_values]
+    private void showRemoteCofingParameters(final boolean dontChangeTextViewSmsCount){
+//        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+//
+//        // Create a Remote Config Setting to enable developer mode, which you can use to increase
+//        // the number of fetches available per hour during development. See Best Practices in the
+//        // README for more information.
+//        // [START enable_dev_mode]
+//        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+//                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+//                .build();
+//        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+//        // [END enable_dev_mode]
+//
+//        // Set default Remote Config parameter values. An app uses the in-app default values, and
+//        // when you need to adjust those defaults, you set an updated value for only the values you
+//        // want to change in the Firebase console. See Best Practices in the README for more
+//        // information.
+//        // [START set_default_values]
+//        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+//        // [END set_default_values]
 
         mFirebaseRemoteConfig.fetch(cacheExpiration).addOnCompleteListener(this, new OnCompleteListener<Void>(){
             @Override
@@ -319,8 +352,10 @@ public class MainActivity extends AppCompatActivity {
                 btnWriteFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNWRITEFILE_ISENABLED));
                 btnReadFile.setEnabled(mFirebaseRemoteConfig.getBoolean(PARAM_BTNREADFIlE_ISENABLED));
 
-                textViewSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
-                textViewSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
+                if (!dontChangeTextViewSmsCount) {
+                    textViewSmsCount.setAllCaps(mFirebaseRemoteConfig.getBoolean(PARAM_STRING_1_CAPS));
+                    textViewSmsCount.setText(mFirebaseRemoteConfig.getString(PARAM_STRING_1));
+                }
 
                 String paramString2 = mFirebaseRemoteConfig.getString(PARAM_STRING_2);
                 if (!paramString2.isEmpty() && paramString2.length() > 0){
