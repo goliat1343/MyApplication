@@ -24,6 +24,7 @@ android {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-maps:11.6.2'
+    implementation 'com.android.support:design:26.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -31,9 +32,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-location:11.6.2'
-    compile 'com.google.firebase:firebase-core:11.6.2'                        // this line must be included to integrate with Firebase
-    compile 'com.google.firebase:firebase-messaging:11.6.2'                   // this line must be included to use FCM
-    compile 'com.google.firebase:firebase-config:11.6.2'                      //for firebase remoteConfig
+    compile 'com.google.android.gms:play-services-drive:11.6.2'
+    compile 'com.google.android.gms:play-services-auth:11.6.2'
+    compile 'com.google.firebase:firebase-core:11.6.2'
+    // this line must be included to integrate with Firebase
+    compile 'com.google.firebase:firebase-messaging:11.6.2'
+    // this line must be included to use FCM
+    compile 'com.google.firebase:firebase-config:11.6.2'
+    //for firebase remoteConfig
     testCompile 'junit:junit:4.12'
 }
 

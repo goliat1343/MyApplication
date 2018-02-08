@@ -65,6 +65,19 @@
         <key>btnReadFile_isEnabled</key>
         <value>true</value>
     </entry>
+
+    <entry>
+        <key>textViewSms_size_size</key>
+        <value>20</value>
+    </entry>
+    <entry>
+        <key>textViewSms_size_unit</key>
+        <value>0</value>
+    </entry>
+    <entry>
+        <key>images_imageView_url</key>
+        <value>https://d1o51r9qdgnnlz.cloudfront.net/static_image/600dd590-5fd7-4a32-bd9a-d26387472bdf/static.jpg</value>
+    </entry>
     
 </defaultsMap>
     <!-- END xml_defaults -->

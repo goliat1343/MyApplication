@@ -2,6 +2,7 @@ package com.example.marekwieciech.myapplication;
 
 import android.app.NotificationManager;
 import android.graphics.BitmapFactory;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -58,8 +59,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             // Builds the notification and issues it.
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+            vibrator();
+
         } catch (Exception e){
             Log.d("blad firebase", "blad kurcze");
         }
+    }
+
+    private void vibrator(){
+        Vibrator vib = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vib.vibrate(new long[]{100, 2000}, -1);
     }
 }
